@@ -17,7 +17,6 @@ headers = {
 }
 
 
-@login_required
 def execute_gql():
 	query = "query { listJummApis { items { vehicleType fees datetime gateNum username } } }"
 	payload_obj = {"query": query}
