@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
-from .models import Vehicle
 from django.db.models import Sum
 from django.template.loader import render_to_string
 
