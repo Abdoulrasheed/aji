@@ -1,5 +1,5 @@
 {% extends 'app/home.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block main %}
     <div class="page-content">
@@ -47,7 +47,7 @@
     <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 		<script type="text/javascript">
 			$(document).ready(()=>{
-				const endpoint = `http://${window.location.hostname}/api/t/`;
+				const endpoint = `http://${window.location.hostname}:8000/api/t/`;
 				$.ajax({
 					url: endpoint,
 					success: (data) => {

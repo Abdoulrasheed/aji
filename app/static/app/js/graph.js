@@ -1,5 +1,5 @@
 $(document).ready(()=>{
-    const endpoint = `http://${window.location.hostname}/api/`
+    const endpoint = `http://${window.location.hostname}:8000/api/`
 
     $.ajax({
       method: "GET",
