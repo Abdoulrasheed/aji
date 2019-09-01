@@ -17,6 +17,8 @@ headers = {
     'cache-control': "no-cache",
 }
 
+
+@login_required
 def execute_gql():
 	query = "query { listJummApis { items { vehicleType fees datetime gateNum username } } }"
 	payload_obj = {"query": query}
@@ -37,20 +39,23 @@ def home(request):
 
 @login_required
 def load_graph_data(request):
+	"""
+		A view that gets data from AWS graphQL AppSync
+		Server and then loads the data in a chart 
+
+	"""
+
+	# execute the API call
 	q = execute_gql()
-	#q = Vehicle.objects.all()
+
 	all_fees = [q[i]['fees'] for i in range(0, len(q))]
 
 	# get sum of all revenue paid (i.e fees)
 	total_amount = reduce(lambda x, y: (x + y), all_fees)
-
-	# get all vehicle labels for use in graph: 
-	# eg ['Cars', 'Cars', 'Cars', 'Napep']
-
 	
 	# get all vehicle labels for use in graph
 	# making sure each label e.g: car appears only once
-	# in the list
+	# in the list: eg ['Cars', 'Cars', 'Cars', 'Napep']
 	v_types = []
 	[v_types.append(q[i]['vehicleType']) for i in range(0, len(q)) if q[i]['vehicleType'] not in v_types]
 
@@ -87,10 +92,3 @@ def start(request):
 	context = {}
 	template = 'app/stats.html'
 	return render(request, template, context)
-
-
-
-
-def graph(request):
-	pass
-	
