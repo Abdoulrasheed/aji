@@ -8,8 +8,10 @@ from django.template.loader import render_to_string
 
 @login_required
 def home(request):
+	q = Vehicle.objects.all()
+	context = {'data': q}
 	template = 'app/table.html'
-	return render(request, template, {})
+	return render(request, template, context)
 
 @login_required
 def load_graph_data(request):
@@ -43,13 +45,6 @@ def load_graph_data(request):
 		'total': total_amount
 		}
 	return JsonResponse(data)
-
-@login_required
-def table(request):
-	q = Vehicle.objects.all()
-	context = {'data': q}
-	template = 'app/table.html'
-	return render(request, template, context)
 
 
 @login_required
