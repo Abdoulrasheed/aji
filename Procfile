@@ -1,1 +1,2 @@
-web: gunicorn modern_market.wsgi --log-file -
+
+web: gunicorn clc.wsgi --log-file -

@@ -5,11 +5,33 @@ from .models import Vehicle
 from django.db.models import Sum
 from django.template.loader import render_to_string
 
+import requests
+import json
+
+from key.aws_keys import APPSYNC_API_KEY, APPSYNC_API_ENDPOINT_URL
+#url = 'https://api.graph.cool/simple/v1/ciyz901en4j590185wkmexyex'
+
+headers = {
+    'Content-Type': "application/json",
+    'x-api-key': APPSYNC_API_KEY,
+    'cache-control': "no-cache",
+}
+
+def execute_gql(query):
+    payload_obj = {"query": query}
+    payload = json.dumps(payload_obj)
+    response = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
+    return response
 
 @login_required
 def home(request):
-	q = Vehicle.objects.all()
-	context = {'data': q}
+	query = "query { listJummApis { items { vehicleType fees datetime gateNum username } } }"
+	data = execute_gql(query)
+	json_data = data.json()['data']['listJummApis']
+	#d = json.loads(json_data)
+	data = [i for i in json_data['items']]
+	data = [data[i] for i in range(0, len(data))]
+	context = {'data': data}
 	template = 'app/table.html'
 	return render(request, template, context)
 
@@ -52,3 +74,10 @@ def start(request):
 	context = {}
 	template = 'app/stats.html'
 	return render(request, template, context)
+
+
+
+
+def graph(request):
+	pass
+	
