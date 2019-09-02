@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
-from django.db.models import Sum
+from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 import requests
@@ -23,17 +22,10 @@ def execute_gql():
 	payload = json.dumps(payload_obj)
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
 	json_data = data.json()['data']['listJummApis']
-	#d = json.loads(json_data)
+	
 	data = [i for i in json_data['items']]
 	data = [data[i] for i in range(0, len(data))]
 	return data
-
-@login_required
-def home(request):
-	data = execute_gql()
-	context = {'data': data}
-	template = 'app/table.html'
-	return render(request, template, context)
 
 @login_required
 def load_graph_data(request):
@@ -83,6 +75,14 @@ def load_graph_data(request):
 		'total': total_amount
 		}
 	return JsonResponse(data)
+
+
+@login_required
+def home(request):
+	data = execute_gql()
+	context = {'data': data}
+	template = 'app/table.html'
+	return render(request, template, context)
 
 
 @login_required

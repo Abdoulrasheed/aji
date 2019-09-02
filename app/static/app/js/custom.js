@@ -1,6 +1,4 @@
 $(document).ready(function(){
-
-
   $(".submenu > a").click(function(e) {
     e.preventDefault();
     var $li = $(this).parent("li");
