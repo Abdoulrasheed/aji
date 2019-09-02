@@ -22,7 +22,7 @@ def execute_gql():
 	payload = json.dumps(payload_obj)
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
 	json_data = data.json()['data']['listJummApis']
-	
+
 	data = [i for i in json_data['items']]
 	data = [data[i] for i in range(0, len(data))]
 	return data
@@ -31,7 +31,7 @@ def execute_gql():
 def load_graph_data(request):
 	"""
 		A view that gets data from AWS graphQL AppSync
-		Server and then loads the data in a chart 
+		Server and then loads the data in a chart
 
 	"""
 
@@ -42,7 +42,7 @@ def load_graph_data(request):
 
 	# get sum of all revenue paid (i.e fees)
 	total_amount = reduce(lambda x, y: (x + y), all_fees)
-	
+
 	# get all vehicle labels for use in graph
 	# making sure each label e.g: car appears only once
 	# in the list: eg ['Cars', 'Cars', 'Cars', 'Napep']
@@ -71,7 +71,7 @@ def load_graph_data(request):
 	data = {
 		'values': values,
 		'labels': v_types,
-		'q': q_data, 
+		'q': q_data,
 		'total': total_amount
 		}
 	return JsonResponse(data)
