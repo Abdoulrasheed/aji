@@ -4,6 +4,14 @@ $(document).ready(()=>{
     $.ajax({
       method: "GET",
       url: endpoint,
+      beforeSend: ()=>{
+        $('.loader').removeAttr('hidden');
+      },
+
+      complete: ()=>{
+        $('.loader').attr('hidden', true);
+      },
+
       success: (data) => {
         total = data.total
         html_detail = data.q
