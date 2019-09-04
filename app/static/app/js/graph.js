@@ -1,6 +1,6 @@
+myChart = 7
 $(document).ready(()=>{
-    const endpoint = `http://${window.location.hostname}/api/`
-
+    const endpoint = `${window.location.origin}/api/`
     $.ajax({
       method: "GET",
       url: endpoint,
@@ -34,6 +34,7 @@ $(document).ready(()=>{
     }
 
     const setGraph = () => {
+        console.log('starting chart ....')
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
         type: 'bar',
@@ -68,7 +69,8 @@ $(document).ready(()=>{
                         beginAtZero: true
                     }
                 }]
-            }
+            },
+            onComplete: done() /// calls function done() {} at end
         }
     });
     }

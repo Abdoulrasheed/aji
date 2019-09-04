@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.pyc
 key/
 sms/send_message.py
 # Distribution / packaging

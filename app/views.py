@@ -17,7 +17,7 @@ headers = {
 
 
 def execute_gql():
-	query = "query { listJummApis { items { vehicleType fees datetime gateNum username } } }"
+	query = "query { listJummApis(limit: 10000) { items { vehicleType fees datetime gateNum username } } }"
 	payload_obj = {"query": query}
 	payload = json.dumps(payload_obj)
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
@@ -53,21 +53,35 @@ def load_graph_data(request):
 	# return the sum of fees of all of them
 	# i.e to avoid having two instances of same type of vehicle type
 	values_ = {}
+	amounts = {}
 	for i in range(0, len(q)):
+		amounts[f"{q[i]['vehicleType']}Amount"] = q[i]['fees']
 		if q[i]['vehicleType'] not in values_:
 			values_[q[i]['vehicleType']] = q[i]['fees']
 		else:
 			values_[q[i]['vehicleType']] += q[i]['fees']
 
-	# get the actual the non-repeatable fees in a list
+	type_total_and_amount = []
+	'''
+		eg [['Cars', 28360, 40],  ['Cars', 28360, 40]]
+	'''
+	[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
+
+	# get the actual non-repeatable fees in a list
 	values = []
 	for key, value in values_.items():
 	    values.append(value)
 
 	temp = 'async/v_type.html'
 
-	q_data = render_to_string(temp, {'q':values_})
+	q_data = render_to_string(temp, {'q':type_total_and_amount})
 
+	a = []
+	[a.append(q[i]['fees']) for i in range(0, len(q)) if q[i]['fees'] not in a]
+	n = zip(v_types, a)
+	#print(values_)
+	#for z, am in n:
+	#	print(type(z))
 	data = {
 		'values': values,
 		'labels': v_types,

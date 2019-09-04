@@ -1,17 +1,17 @@
-{% extends 'app/home.html' %}
+{% extends 'app/base.html' %}
 {% load static %}
 
 {% block main %}
     <div class="page-content">
     <!--Main content-->
 		  <div class="col-md-12">
-  			<div class="content-box-large">
+  			<div id="capture" class="content-box-large">
   				<div class="panel-heading">
 					<div class="panel-title">Bar & Summary Table</div>
 
 					<div class="panel-options">
+            <a title="Download Image report" id="download_img" href="#" data-rel="reload"><i class="glyphicon glyphicon-download-alt"></i></a>
 						<a onclick="location.reload()" data-rel="collapse"><i class="glyphicon glyphicon-refresh"></i></a>
-						<a href="#" data-rel="reload"><i class="glyphicon glyphicon-cog"></i></a>
 					</div>
 				</div>
   				<div class="panel-body">
@@ -25,18 +25,19 @@
                   <thead>
                     <tr>
                       <th>Vehicle Type</th>
-                      <th>Fees</th>
+                      <th>Amount</th>
+                      <th>Total</th>
                     </tr>
                   </thead>
                   <tbody class="v_detail">
                     <tr>
-                    <td colspan="2">
-                      <img class="loader" hidden src="{% static 'app/images/loader.gif' %}">
-                    </td>
-                  </tr>
+                      <td colspan="2">
+                        <img class="loader" hidden src="{% static 'app/images/loader.gif' %}">
+                      </td>
+                      </tr>
                   </tbody>
                   <tr>
-                      <th>TOTAL</th>
+                      <th colspan="2">TOTAL</th>
                       <td class="v_total"></td>
                   </tr>
                 </table>
@@ -50,7 +51,30 @@
       {% block js %}
       <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
       <script src="{% static 'app/js/graph.js' %}"></script>
-      <script src="{% static 'app/js/q.js' %}"></script>
-              <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
     <script src="{% static 'app/js/tables.js' %}"></script>
+    <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+      <script>
+        var dwn = document.querySelector('#download_img');
+        const done = ()=> {
+          console.log('done called....')
+          html2canvas(document.querySelector("#capture")).then(canvas => {
+            var context = canvas.getContext("2d");
+            var img = new Image();
+            img.onload = ()=> {
+              context.drawImage(img, 0, 0);
+            };
+
+            var strDataURI = canvas.toDataURL();
+            var url_base64 = document.getElementById('myChart').toDataURL('image/png');
+            img.src = strDataURI;
+            dwn.setAttribute('href', url_base64);
+          });
+
+          dwn.addEventListener('click', () => {
+            dwn.setAttribute('download', 'Chart Report.png');
+          });
+          console.log('done done ....')
+        }
+      </script>
 {% endblock js %}

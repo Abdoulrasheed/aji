@@ -1,7 +1,8 @@
-                    {% for key, value in q.items %}
+                    {% for type, total, amount in q %}
                     <tr>
-                      <td>{{ key }}</td>
-                      <td>{{ value }}</td>
+                      <td>{{ type }}</td>
+                      <td>{{ amount }}</td>
+                      <td>{{ total }}</td>
 </tr>
                     {% endfor %}
                     
