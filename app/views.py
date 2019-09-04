@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 import requests
 import json
@@ -17,7 +18,7 @@ headers = {
 
 
 def execute_gql():
-	query = "query { listJummApis(limit: 10000) { items { vehicleType fees datetime gateNum username } } }"
+	query = 'query { listJummApis(limit: 10000, filter:{ datetime: { between: ["2019-09-04", "2019-09-05"]}}) { items { vehicleType fees datetime gateNum username } } }'
 	payload_obj = {"query": query}
 	payload = json.dumps(payload_obj)
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
@@ -84,6 +85,13 @@ def load_graph_data(request):
 		}
 	return JsonResponse(data)
 
+def filter(request):
+	query = 'query { listJummApis(limit: 10000, filter:{ datetime: { between: ["2019-09-04", "2019-09-05"]}}) { items { vehicleType fees datetime gateNum username } } }'
+	payload_obj = {"query": query}
+	payload = json.dumps(payload_obj)
+	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
+	print(data)
+	return HttpResponse(data)
 
 @login_required
 def home(request):
