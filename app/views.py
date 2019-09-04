@@ -76,12 +76,6 @@ def load_graph_data(request):
 
 	q_data = render_to_string(temp, {'q':type_total_and_amount})
 
-	a = []
-	[a.append(q[i]['fees']) for i in range(0, len(q)) if q[i]['fees'] not in a]
-	n = zip(v_types, a)
-	#print(values_)
-	#for z, am in n:
-	#	print(type(z))
 	data = {
 		'values': values,
 		'labels': v_types,
