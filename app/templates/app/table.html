@@ -7,14 +7,14 @@
 		  <div class="col-md-12">
   			<div  id="capture" class="content-box-large">
   				<div class="panel-heading">
-					<div class="panel-title">Reports</div>
+					<div class="panel-title">Reports <span class="text-primary" id="date_label"></span></div>
 					<div class="panel-options">
 						<a title="Download Image report" id="download_img" href="#" data-rel="reload"><i class="glyphicon glyphicon-download-alt"></i></a>
 						<a onclick="location.reload()" data-rel="collapse"><i class="glyphicon glyphicon-refresh"></i></a>
 					</div>
 				</div>
   				<div class="panel-body">
-  				<span id="data_url" url="{% url 'api_load_graph_data' %}"></span>
+  				<span id="data_url" url="{% url 'home_page' %}"></span>
 			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
 						<thead>
 							<tr>
@@ -64,7 +64,6 @@
           $('input[name="daterange"]').daterangepicker({
               opens: 'left'
             }, function(start, end, label) {
-
             $.ajax({
               url: url,
               data:{
@@ -73,15 +72,19 @@
               },
 
               beforeSend: ()=> {
-                alert('b4');
+                console.log('b4');
               },
 
               complete: ()=>{
-                alert('complete');
+                console.log('complete');
               },
-
               success: (data)=>{
-                alert('success')
+                if (data == 'NoData'){
+                  alert('No data within the selected date range')
+                }else{
+                	var table = $('#example').DataTable();
+                  $("#load_data").html(data);
+                }
               }
             });
           });

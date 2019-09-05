@@ -102,7 +102,28 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script>
+      const today = new Date().toLocaleDateString();
+      const fullDate = `${today} - ${today}`
+      $("#daterange").val(fullDate);
+
+      getDate();
+        $("#daterange").on('change', ()=>{
+            getDate();
+          });
+        function getDate() {
+          var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          var txt_date = $("#daterange").val();
+          from = txt_date.split(' - ')[0];
+          to = txt_date.split(' - ')[1];
+          var dte_from  = new Date(from).toLocaleDateString("en-US", options);
+          var dte_to  = new Date(to).toLocaleDateString("en-US", options);
+          var full_date = `${dte_from} to ${dte_to}`
+          $("#date_label").text(full_date);
+        }
+    </script>
     {% block js %}
     {% endblock js %}
+
   </body>
 </html>

@@ -22,7 +22,7 @@ def execute_gql(**kwargs):
 		from_ = kwargs['start']
 		to = kwargs['end']
 	else:
-		from_ = date.today() - timedelta(days=1) # default to todays data
+		from_ = date.today() - timedelta(days=0) # default to todays data
 		to = date.today()
 	query = '''
 		query { 
@@ -113,13 +113,29 @@ def load_graph_data(request):
 
 @login_required
 def home(request):
-	data = execute_gql()
+	start = request.GET.get('start')
+	end = request.GET.get('end')
+
+	# if the user tries to filter
+	# then start and end will be available
+	# therefore respond through HttpResponse 
+	# for ajax to consume the results
+	if all((start, end)):
+		data = execute_gql(start=start, end=end)
+		if not data:
+			return HttpResponse('NoData')
+		template = 'async/ajax_table.html'
+		data = render_to_string(template, {'data': data})
+		return HttpResponse(data)
+	else:
+		data = execute_gql() # query today's default data
+
 	context = {'data': data}
 	template = 'app/table.html'
 	return render(request, template, context)
 
 @login_required
-def start(request):
+def statistics(request):
 	context = {}
 	template = 'app/stats.html'
 	return render(request, template, context)

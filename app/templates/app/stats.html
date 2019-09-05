@@ -7,7 +7,7 @@
 		  <div class="col-md-12">
   			<div id="capture" class="content-box-large">
   				<div class="panel-heading">
-					<div class="panel-title">Bar & Summary Table for <code id="date_label"></code></div>
+					<div class="panel-title">Bar & Summary Table for <span class="text-primary" id="date_label"></span></div>
 
 					<div class="panel-options">
             <a title="Download Image report" id="download_img" href="#" data-rel="reload"><i class="glyphicon glyphicon-download-alt"></i></a>
@@ -115,19 +115,5 @@
             });
           });
         });
-        getDate();
-        $("#daterange").on('change', ()=>{
-            getDate();
-          });
-        function getDate() {
-          var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          var txt_date = $("#daterange").val();
-          from = txt_date.split(' - ')[0];
-          to = txt_date.split(' - ')[1];
-          var dte_from  = new Date(from).toLocaleDateString("en-US", options);
-          var dte_to  = new Date(to).toLocaleDateString("en-US", options);
-          var full_date = `${dte_from} to ${dte_to}`
-          $("#date_label").text(full_date);
-        }
       </script>
 {% endblock js %}
