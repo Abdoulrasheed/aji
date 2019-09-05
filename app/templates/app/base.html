@@ -109,8 +109,9 @@
 
       getDate();
         $("#daterange").on('change', ()=>{
-            getDate();
-          });
+          getDate();
+        });
+
         function getDate() {
           var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
           var txt_date = $("#daterange").val();
@@ -121,6 +122,7 @@
           var full_date = `${dte_from} to ${dte_to}`
           $("#date_label").text(full_date);
         }
+
     </script>
     {% block js %}
     {% endblock js %}
