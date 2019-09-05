@@ -22,7 +22,7 @@ def execute_gql(**kwargs):
 		from_ = kwargs['start']
 		to = kwargs['end']
 	else:
-		from_ = date.today() - timedelta(days=2) # default to todays data
+		from_ = date.today() - timedelta(days=0) # default to todays data
 		to = date.today()
 	query = '''
 		query { 
