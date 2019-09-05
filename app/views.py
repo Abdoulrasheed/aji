@@ -62,6 +62,9 @@ def load_graph_data(request):
 	else:
 		q = execute_gql() # query today's default data
 
+	if not q:
+		return HttpResponse('NoData')
+
 	all_fees = [q[i]['fees'] for i in range(0, len(q))]
 
 	# get sum of all revenue paid (i.e fees)

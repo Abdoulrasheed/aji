@@ -1,6 +1,5 @@
 $(document).ready(()=>{
-    const endpoint = `http://${window.location.hostname}/api/`
-
+    const endpoint = `${window.location.origin}/api/`
     $.ajax({
       method: "GET",
       url: endpoint,
@@ -26,14 +25,14 @@ $(document).ready(()=>{
         console.log(`error_data: ${error_data}`);
       },
     });
-
+});
     const setData = (total, html_detail) =>{
         $('.v_total').text(total);
         $('.v_detail').html(html_detail);
 
     }
-
     const setGraph = () => {
+        console.log('starting chart ....')
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
         type: 'bar',
@@ -68,8 +67,8 @@ $(document).ready(()=>{
                         beginAtZero: true
                     }
                 }]
-            }
+            },
+            onComplete: done() /// calls function done() {} at end
         }
     });
     }
-});

@@ -7,7 +7,7 @@
 		  <div class="col-md-12">
   			<div id="capture" class="content-box-large">
   				<div class="panel-heading">
-					<div class="panel-title">Bar & Summary Table</div>
+					<div class="panel-title">Bar & Summary Table <span id="date_label"></span></div>
 
 					<div class="panel-options">
             <a title="Download Image report" id="download_img" href="#" data-rel="reload"><i class="glyphicon glyphicon-download-alt"></i></a>
@@ -58,7 +58,6 @@
       <script>
         var dwn = document.querySelector('#download_img');
         const done = ()=> {
-          console.log('done called....')
           html2canvas(document.querySelector("#capture")).then(canvas => {
             var context = canvas.getContext("2d");
             var img = new Image();
@@ -75,7 +74,6 @@
           dwn.addEventListener('click', () => {
             dwn.setAttribute('download', 'Chart Report.png');
           });
-          console.log('done done ....')
         }
       </script>
 
@@ -87,7 +85,6 @@
           $('input[name="daterange"]').daterangepicker({
               opens: 'left'
             }, function(start, end, label) {
-
             $.ajax({
               url: url,
               data:{
@@ -96,21 +93,24 @@
               },
 
               beforeSend: ()=> {
-                alert('b4');
+                console.log('b4');
               },
 
               complete: ()=>{
-                alert('complete');
+                console.log('complete');
               },
-
               success: (data)=>{
-                total = data.total
-                html_detail = data.q
-                setData(total, html_detail);
+                if (data == 'NoData'){
+                  alert('No data within the selected date range')
+                }else{
+                  total = data.total
+                  html_detail = data.q
+                  setData(total, html_detail);
 
-                labels = data.labels
-                values = data.values
-                setGraph(labels, values);
+                  labels = data.labels
+                  values = data.values
+                  setGraph(labels, values);
+                }
               }
             });
           });
