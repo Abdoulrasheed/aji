@@ -72,18 +72,32 @@
               },
 
               beforeSend: ()=> {
-                console.log('b4');
+               $('.loader').removeAttr('hidden');
               },
 
               complete: ()=>{
-                console.log('complete');
-              },
+                $('.loader').attr('hidden', true);
+      		},
               success: (data)=>{
                 if (data == 'NoData'){
                   alert('No data within the selected date range')
                 }else{
-                	var table = $('#example').DataTable();
-                  $("#load_data").html(data);
+                	$("#load_data").html(data);
+     //            	var table = $('#example').DataTable();
+     //            	table.clear()
+     //            	console.log(data.data);
+					// for (var i = 0; i < data.data.length; i++){
+					//     table.rows.add(data.data[i]);
+					// }
+					// table.draw();
+					
+                  //$("#load_data").html(data);
+                  //var table = $('#example').DataTable();
+                  
+                  //table.clear();
+                  //table.draw();
+                  //table.rows.add([data]);
+                  //table.draw();
                 }
               }
             });

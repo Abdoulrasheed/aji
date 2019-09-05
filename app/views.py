@@ -22,7 +22,7 @@ def execute_gql(**kwargs):
 		from_ = kwargs['start']
 		to = kwargs['end']
 	else:
-		from_ = date.today() - timedelta(days=0) # default to todays data
+		from_ = date.today() - timedelta(days=2) # default to todays data
 		to = date.today()
 	query = '''
 		query { 
@@ -125,6 +125,10 @@ def home(request):
 			return HttpResponse('NoData')
 		template = 'async/ajax_table.html'
 		data = render_to_string(template, {'data': data})
+		# print(data)
+		# data = data.replace('}{', '},{') # replace '}{' with '},{'
+		# data = f'[{data}]' # add brackets around it
+		# data = data.loads(data) # confirm that it's valid json
 		return HttpResponse(data)
 	else:
 		data = execute_gql() # query today's default data
