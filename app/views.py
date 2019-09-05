@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-
+from django.template.loader import get_template
 import requests
 import json
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+from weasyprint import HTML, CSS
 
 from key.aws_keys import APPSYNC_API_KEY, APPSYNC_API_ENDPOINT_URL
 from functools import reduce
@@ -21,9 +22,14 @@ def execute_gql(**kwargs):
 	if kwargs:
 		from_ = kwargs['start']
 		to = kwargs['end']
+		if '/' in from_ or '/' in to:	
+			# change dates to desired format: 2019-09-05
+			from_ = datetime.strptime(from_, '%m/%d/%Y').strftime('%Y-%m-%d')
+			to = datetime.strptime(to, '%m/%d/%Y').strftime('%Y-%m-%d')
 	else:
-		from_ = date.today() - timedelta(days=0) # default to todays data
-		to = date.today()
+		from_ = f'{date.today() - timedelta(days=0)}' # default to todays data
+		to = f'{date.today()}'
+
 	query = '''
 		query { 
 			listJummApis(limit: 10000, filter:
@@ -44,15 +50,11 @@ def execute_gql(**kwargs):
 	data = [data[i] for i in range(0, len(data))]
 	return data
 
-@login_required
-def load_graph_data(request):
-	"""
-		A view that gets data from AWS graphQL AppSync
-		Server and then loads the data in a chart
 
-	"""
-	start = request.GET.get('start')
-	end = request.GET.get('end')
+def get_table_graph_data(**kwargs):
+	if kwargs:
+		start = kwargs['start']
+		end = kwargs['end']
 
 	# if the user tries to filter
 	# then start and end will be available
@@ -108,16 +110,32 @@ def load_graph_data(request):
 		'q': q_data,
 		'total': total_amount
 		}
+	return data
+
+
+@login_required
+def load_graph_data(request):
+	"""
+		A view that fetches data from AWS graphQL AppSync
+		Server and then loads the data in a html canvas of chart.js
+	"""
+	start = request.GET.get('start')
+	end = request.GET.get('end')
+	data = get_table_graph_data(start=start, end=end)
+
 	return JsonResponse(data)
 
 @login_required
 def home(request):
+	"""
+		the home page view that returns all data from api
+	"""
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 
 	# if the user tries to filter
-	# then start and end will be available
-	# therefore respond through HttpResponse 
+	# then 'start' and 'end' will both be true
+	# therefore respond with a HttpResponse 
 	# for ajax to consume the results
 	if all((start, end)):
 		data = execute_gql(start=start, end=end)
@@ -125,10 +143,6 @@ def home(request):
 			return HttpResponse('NoData')
 		template = 'async/ajax_table.html'
 		data = render_to_string(template, {'data': data})
-		# print(data)
-		# data = data.replace('}{', '},{') # replace '}{' with '},{'
-		# data = f'[{data}]' # add brackets around it
-		# data = data.loads(data) # confirm that it's valid json
 		return HttpResponse(data)
 	else:
 		data = execute_gql() # query today's default data
@@ -142,3 +156,39 @@ def statistics(request):
 	context = {}
 	template = 'app/stats.html'
 	return render(request, template, context)
+
+@login_required
+def generate_report(request):
+	start = request.GET.get('start')
+	end = request.GET.get('end')
+	print(start)
+	print(end)
+
+	if all((start, end)):
+		template = 'reports/statistics_report.html'
+		data = get_table_graph_data(start=start, end=end)
+		print(f'data =================================\n{data}')
+
+		context = {
+			'data':data,
+			'start': start,
+			'end': end
+		}
+
+		template = get_template(template)
+		html = template.render(context)
+
+		css_string = """@page {
+			size: a4 portrait;
+			margin: 1mm;
+			counter-increment: page;
+		}"""
+
+		pdf_file = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
+				stylesheets=[CSS(string=css_string)], presentational_hints=True)
+		response = HttpResponse(pdf_file, content_type='application/pdf')
+		response['Content-Disposition'] = 'filename="Report.pdf"'
+		return response
+		return HttpResponse(response.getvalue(), content_type='application/pdf')
+	else:
+		return HttpResponse('Please choose a date range')

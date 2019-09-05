@@ -121,6 +121,12 @@
           var dte_to  = new Date(to).toLocaleDateString("en-US", options);
           var full_date = `${dte_from} to ${dte_to}`
           $("#date_label").text(full_date);
+
+          // set the url for download report
+          
+          var pdf = document.querySelector('#download_pdf');
+          var url = `{% url 'generate_report' %}?start=${from}&end=${to}`;
+          pdf.setAttribute('href', url);
         }
 
     </script>
