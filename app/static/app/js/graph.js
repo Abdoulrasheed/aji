@@ -1,4 +1,3 @@
-myChart = 7
 $(document).ready(()=>{
     const endpoint = `${window.location.origin}/api/`
     $.ajax({

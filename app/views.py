@@ -6,6 +6,7 @@ from django.http import HttpResponse
 
 import requests
 import json
+from datetime import timedelta, date
 
 from key.aws_keys import APPSYNC_API_KEY, APPSYNC_API_ENDPOINT_URL
 from functools import reduce
@@ -16,13 +17,29 @@ headers = {
     'cache-control': "no-cache",
 }
 
+def execute_gql(**kwargs):
+	if kwargs:
+		from_ = kwargs['start']
+		to = kwargs['end']
+	else:
+		from_ = date.today() - timedelta(days=1) # default to todays data
+		to = date.today()
+	query = '''
+		query { 
+			listJummApis(limit: 10000, filter:
+				{ datetime: 
+					{ between: ["%s", "%s"]}}) 
+					{ items {
+						vehicleType fees datetime gateNum username 
+						} 
+					} 
+				}'''%(from_, to)
 
-def execute_gql():
-	query = 'query { listJummApis(limit: 10000, filter:{ datetime: { between: ["2019-09-04", "2019-09-05"]}}) { items { vehicleType fees datetime gateNum username } } }'
 	payload_obj = {"query": query}
 	payload = json.dumps(payload_obj)
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
 	json_data = data.json()['data']['listJummApis']
+	print(f'data: {json_data}')
 
 	data = [i for i in json_data['items']]
 	data = [data[i] for i in range(0, len(data))]
@@ -35,9 +52,15 @@ def load_graph_data(request):
 		Server and then loads the data in a chart
 
 	"""
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 
-	# execute the API call
-	q = execute_gql()
+	# if the user tries to filter
+	# then start and end will be available
+	if all((start, end)):
+		q = execute_gql(start=start, end=end)
+	else:
+		q = execute_gql() # query today's default data
 
 	all_fees = [q[i]['fees'] for i in range(0, len(q))]
 
@@ -85,21 +108,12 @@ def load_graph_data(request):
 		}
 	return JsonResponse(data)
 
-def filter(request):
-	query = 'query { listJummApis(limit: 10000, filter:{ datetime: { between: ["2019-09-04", "2019-09-05"]}}) { items { vehicleType fees datetime gateNum username } } }'
-	payload_obj = {"query": query}
-	payload = json.dumps(payload_obj)
-	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
-	print(data)
-	return HttpResponse(data)
-
 @login_required
 def home(request):
 	data = execute_gql()
 	context = {'data': data}
 	template = 'app/table.html'
 	return render(request, template, context)
-
 
 @login_required
 def start(request):
