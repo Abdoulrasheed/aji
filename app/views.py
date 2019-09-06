@@ -27,9 +27,10 @@ def execute_gql(**kwargs):
 			from_ = datetime.strptime(from_, '%m/%d/%Y').strftime('%Y-%m-%d')
 			to = datetime.strptime(to, '%m/%d/%Y').strftime('%Y-%m-%d')
 	else:
-		from_ = f'{date.today() - timedelta(days=1)}' # default to todays data
+		from_ = f'{date.today() - timedelta(days=0)}' # default to todays data
 		to = f'{date.today()}'
-	print(f'============================{from_}')
+	print(f'from: {from_}')
+	print(f'to: {to}')
 
 	query = '''
 		query { 
