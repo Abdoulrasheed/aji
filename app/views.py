@@ -40,10 +40,9 @@ def execute_gql(**kwargs):
 						} 
 					} 
 				}'''%(from_, to)
-
-	payload_obj = {"query": query}
-	payload = json.dumps(payload_obj)
-	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, data=payload, headers=headers)
+				
+	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, json={'query': query}, headers=headers)
+	print(data)
 	json_data = data.json()['data']['listJummApis']
 
 	data = [i for i in json_data['items']]
