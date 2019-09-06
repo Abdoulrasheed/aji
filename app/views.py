@@ -29,8 +29,6 @@ def execute_gql(**kwargs):
 	else:
 		from_ = f'{date.today() - timedelta(days=0)}' # default to todays data
 		to = f'{date.today()}'
-	print(f'from: {from_}')
-	print(f'to: {to}')
 
 	query = '''
 		query { 
@@ -124,8 +122,8 @@ def load_graph_data(request):
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	data = get_table_graph_data(start=start, end=end)
-
-	return JsonResponse({"data": data})
+	data = {'data': data}
+	return JsonResponse(data['data'])
 
 @login_required
 def home(request):

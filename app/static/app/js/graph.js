@@ -59,16 +59,17 @@ $(document).ready(()=>{
       },
 
       success: (data) => {
-        total = data.data.total
-        html_detail = data.data.q
+        total = data.total
+        html_detail = data.q
         setData(total, html_detail);
 
-        labels = data.data.labels
-        values = data.data.values
+        labels = data.labels
+        values = data.values
         setGraph(labels, values);
       },
 
       error: (error_data) => {
+        console.log(error_data);
         console.log(`error_data: ${error_data}`);
       },
     });
