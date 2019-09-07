@@ -27,14 +27,6 @@
 							</tr>
 						</thead>
 						<tbody id="load_data">
-							<tr>
-								<td>..</td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
 							{% for v in data %}
 							<tr>
 								<td>{{ forloop.counter }}</td>
@@ -45,6 +37,14 @@
 								<td>{{ v.username }}</td>
 							</tr>
 							{% endfor %}
+              <tr>
+                <td>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
 						</tbody>
 					</table>
   				</div>
