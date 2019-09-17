@@ -1,0 +1,112 @@
+{% load static i18n humanize %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title></title>
+        <style type="text/css">
+
+        body {
+            font-weight: 400;
+            font-size: 12px;
+            font-family: Verdana, Arial;
+        }
+.outer{
+  display: table;
+  margin: 0 auto;
+  width: 90%;
+}
+
+li{
+	display: inline;
+	list-style: none;
+	margin-right: 100px;
+}
+
+#inner {
+        display: table;
+        float: left;
+        text-align: center;
+        margin-left: -60px;
+    }
+.logo {
+    display: table;
+    float: left;
+    margin-top: 30px;
+    margin-left: 12px;
+
+}
+
+.item_l{
+    width:170px;
+    display:inline-block;
+    margin-bottom: 5px;
+
+}
+
+.item_r{
+    width:70px;
+    display:inline-block;
+    margin-bottom: 5px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 70%;
+    margin: 0 auto;
+}
+
+td, th {
+    border: 1px solid black;
+    text-align: left;
+    padding: 14px;
+    /*height*/
+}
+
+
+th{
+    color: black;
+    border-bottom: 2px solid black;
+}
+
+</style>
+    </head>
+    <body>
+        <div class="outer">
+             <div class="logo">
+                 <img src="{{ setting.school_logo.url }}" alt="" width="100px"  />
+          </div>
+          <div>
+          	<center>
+            <p style="color: blue; font-size: 13px;">{{ 'Jimeta Ultra Modern Market'|upper }}</p>
+            <p style="color: blue; font-size: 12px;margin-top: -10px;">{{ start }} to {{ end }} Report Summary</p>
+         </center>
+          </div>
+        </div>
+        <div class='wrapper'>
+        	<table class="table table-striped table-bordered" id="example">
+                  <thead>
+                    <tr>
+                      <th>Vehicle Type</th>
+                      <th>Amount</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="v_detail">
+                  	{{ data.q }}
+                    <tr>
+                      <td colspan="2">
+                        <img class="loader" hidden src="{% static 'app/images/loader.gif' %}">
+                      </td>
+                      </tr>
+                  </tbody>
+                  <tr>
+                      <th colspan="2">TOTAL</th>
+                      <td class="v_total">{{ data.total }}</td>
+                  </tr>
+                </table>
+    	</div>
+    <br>
+    <br>
+    <p style="page-break-after: always"/>
+    </body>
+</html>
