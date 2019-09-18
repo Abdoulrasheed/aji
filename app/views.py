@@ -72,16 +72,17 @@ def execute_gql(**kwargs):
 
 def get_table_graph_data(**kwargs):
 	if kwargs:
-		start = kwargs['start']
-		end = kwargs['end']
+		start = kwargs.get('start', None)
+		end = kwargs.get('end', None)
+		gate_no = kwargs.get('gate_no', 0)
 
 	# if the user tries to filter
 	# then start and end will be available
 
 	if all((start, end)):
-		q = execute_gql(start=start, end=end)
+		q = execute_gql(start=start, end=end, gate_no=gate_no)
 	else:
-		q = execute_gql() # query today's default data
+		q = execute_gql(gate_no=gate_no) # query today's data
 
 	if not q:
 		return HttpResponse('NoData')
@@ -144,7 +145,9 @@ def load_graph_data(request):
 	"""
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	data = get_table_graph_data(start=start, end=end)
+	gate_no = request.GET.get('gate_no')
+	print(f'============== {gate_no} =====================')
+	data = get_table_graph_data(start=start, end=end, gate_no=gate_no)
 	data = {'data': data}
 	return JsonResponse(data['data'])
 
@@ -182,7 +185,8 @@ def home(request):
 
 @login_required
 def statistics(request):
-	context = {}
+	gates = Gate.objects.all()
+	context = {'gates': gates, 'is_statistics_page': True}
 	template = 'app/stats.html'
 	return render(request, template, context)
 

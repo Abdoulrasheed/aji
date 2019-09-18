@@ -60,7 +60,11 @@
                           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Gates <b class="caret"></b></a>
                           <ul class="dropdown-menu animated fadeInUp">
                             {% for gate in gates %}
-                            <li><a href="?gate={{ gate.gate_number }}">{{ gate.name }}</a></li>
+                              {% if is_statistics_page %}
+                                <li><a class="filter-by-gate" href="#" data-gate="{{ gate.gate_number }}">{{ gate.name }}</a></li>
+                              {% else %}
+                                <li><a href="?gate={{ gate.gate_number }}">{{ gate.name }}</a></li>
+                              {% endif %}
                             {% endfor %}
                             <li><a href="#">Manage Gates</a></li>
                           </ul>

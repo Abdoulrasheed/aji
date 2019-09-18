@@ -7,7 +7,7 @@
       <div class="col-md-12">
         <div id="capture" class="content-box-large">
           <div class="panel-heading">
-          <div class="panel-title">Bar & Summary Table for <span class="text-primary" id="date_label"></span></div>
+          <div class="panel-title">Bar &#38; Summary Table for <span class="text-primary" id="date_label"></span></div>
 
           <div class="panel-options">
             <a title="Download Image report" id="download_img" href="#"><i class="glyphicon glyphicon-download-alt"></i></a>
@@ -83,42 +83,6 @@
 
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
           <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-      <script>
-        $(function() {
-          const url = $("#data_url").attr('url')
-          $('input[name="daterange"]').daterangepicker({
-              opens: 'left'
-            }, function(start, end, label) {
-            $.ajax({
-              url: url,
-              data:{
-                'start': start.format('YYYY-MM-DD'),
-                'end': end.format('YYYY-MM-DD')
-              },
-
-              beforeSend: ()=>{
-                  $('.loader').removeAttr('hidden');
-                },
-
-              complete: ()=>{
-                  $('.loader').attr('hidden', true);
-                },
-                
-              success: (data)=>{
-                if (data == 'NoData'){
-                  alert('No data within the selected date range')
-                }else{
-                  total = data.total
-                  html_detail = data.q
-                  setData(total, html_detail);
-
-                  labels = data.labels
-                  values = data.values
-                  setGraph(labels, values);
-                }
-              }
-            });
-          });
-        });
-      </script>
+      <script src="{% static 'app/js/filter_data_by_date.js' %}"></script>
+      <script src="{% static 'app/js/filter_data_by_gate.js' %}"></script>
 {% endblock js %}
