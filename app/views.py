@@ -19,209 +19,115 @@ headers = {
     'cache-control': "no-cache",
 }
 
+@login_required
+def home(request):
+	context = {}
+	template = 'app/home.html'
+	return render(request, template, context)
+
 def execute_gql(**kwargs):
-	from_ = kwargs.get('start', f'{date.today() - timedelta(days=0)}') # default to todays data
+	gate_no = kwargs.get('gate_number')
+	facility_no = kwargs.get('facility_number')
 
-	to = kwargs.get('end', f'{date.today()}')
-
-	gate_no = kwargs.get('gate_no', None)
-
-	if '/' in from_ or '/' in to:	
-		# change dates to desired format: 2019-09-05
-
-		from_ = datetime.strptime(from_, '%m/%d/%Y').strftime('%Y-%m-%d')
-		to = datetime.strptime(to, '%m/%d/%Y').strftime('%Y-%m-%d')
+	gate_no = f'Gate {gate_no}'
+	facility_no = f'Facility {facility_no}'
 
 	query = '''
 		query { 
-			listJummApis(limit: 10000, filter:
-				{ datetime: 
-					{ between: ["%s", "%s"]}}) 
+			listJummApps(limit: 10000) 
 					{ items {
-						vehicleType fees datetime gateNum username 
+						itemType fee date deviceName receiptType 
 						} 
 					} 
-				}'''%(from_, to)
+				}'''
 					
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, json={'query': query}, headers=headers)
-	json_data = data.json()['data']['listJummApis']
+	input_dict = data.json()['data']['listJummApps']
 
-	if gate_no:
-		""" filter data by gate number """
+	# filter 'Gates Pass' data by gate number
 
-		# Transform json input to python objects
-		input_dict = data.json()
-		# Filter python objects with list comprehensions
+	gate_output_dict = []
+	for x in input_dict['items']:
+		if x['deviceName'] == gate_no and x['receiptType'] == 'Gate Pass':
+			gate_output_dict.append(x)
 
-		output_dict = []
-		for x in input_dict['data']['listJummApis']['items']:
-			if x['gateNum'] is int(gate_no):
-				output_dict.append(x)
+	# filter 'Loading/Offloading' data by gate number
 
-		# Transform python object back into json
-		data = json.dumps(output_dict)
-		data = [i for i in json_data['items']]
-		data = [output_dict[i] for i in range(0, len(output_dict))]
-		print(data)
-		return data
+	loading_offloading_output_dict = []
+	for x in input_dict['items']:
+		if x['deviceName'] is gate_no and x['receiptType'] == 'Loading/Offloading':
+			loading_offloading_output_dict.append(x)
 
-	data = [i for i in json_data['items']]
-	data = [data[i] for i in range(0, len(data))]
+	# filter 'Facility' data by Facility number
+
+	facility_output_dict = []
+	for x in input_dict['items']:
+		if x['deviceName'] is facility_no:
+			facility_output_dict.append(x)
+
+	# Transform python object back into json
+
+	# data = json.dumps(output_dict)
+	# data = [i for i in output_dict['items']]
+	# json_data = [output_dict[i] for i in range(0, len(output_dict))]
+
+	# data = [i for i in json_data['items']]
+	# data = [data[i] for i in range(0, len(data))]
+	data = [gate_output_dict, loading_offloading_output_dict, facility_output_dict]
 	return data
 
 
-def get_table_graph_data(**kwargs):
-	if kwargs:
-		start = kwargs.get('start', None)
-		end = kwargs.get('end', None)
-		gate_no = kwargs.get('gate_no', 0)
+@login_required
+def get_data(request):
+	gate_number = request.GET.get('gate_number')
 
-	# if the user tries to filter
-	# then start and end will be available
+	date = request.GET.get('date')
 
-	if all((start, end)):
-		q = execute_gql(start=start, end=end, gate_no=gate_no)
-	else:
-		q = execute_gql(gate_no=gate_no) # query today's data
+	q = execute_gql(gate_number=gate_number) # query today's data
 
 	if not q:
 		return HttpResponse('NoData')
 
-	all_fees = [q[i]['fees'] for i in range(0, len(q))]
+	overall_totals = []
+	all_type_total_and_amount = []
 
-	# get sum of all revenue paid (i.e fees)
+	for n in range(0, len(q)):
+		all_fees = [q[n][i]['fee'] for i in range(0, len(q[n]))]
+		# get sum of fee
 
-	total_amount = reduce(lambda x, y: (x + y), all_fees)
-
-	# get all vehicle labels for use in graph
-	# making sure each label e.g: car appears only once
-	# in the list: eg ['Cars', 'Cars', 'Cars', 'Napep']
-
-	v_types = []
-	[v_types.append(q[i]['vehicleType']) for i in range(0, len(q)) if q[i]['vehicleType'] not in v_types]
-
-	# if same type of vehicle appears more than once
-	# return the sum of fees of all of them
-	# i.e to avoid having two instances of same type of vehicle type
-
-	values_ = {}
-	amounts = {}
-	for i in range(0, len(q)):
-		amounts[f"{q[i]['vehicleType']}Amount"] = q[i]['fees']
-		if q[i]['vehicleType'] not in values_:
-			values_[q[i]['vehicleType']] = q[i]['fees']
+		if all_fees:
+			total_amount = reduce(lambda x, y: (int(x) + int(y)), all_fees)
 		else:
-			values_[q[i]['vehicleType']] += q[i]['fees']
+			total_amount = 0
 
-	type_total_and_amount = []
-	'''
-		eg [['Cars', 28360, 40],  ['Cars', 28360, 40]]
-	'''
-	[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
+		overall_totals.append(total_amount)
 
-	# get the actual non-repeatable fees in a list
-	values = []
-	for key, value in values_.items():
-	    values.append(value)
+		values_ = {}
+		amounts = {}
+		for i in range(0, len(q[n])):
+			amounts[f"{q[n][i]['itemType']}Amount"] = q[n][i]['fee']
+			if q[n][i]['itemType'] not in values_:
+				values_[q[n][i]['itemType']] = int(q[n][i]['fee'])
+			else:
+				values_[q[n][i]['itemType']] += int(q[n][i]['fee'])
 
-	temp = 'async/v_type.html'
+		type_total_and_amount = [] # [['Cars', 28360, 40],  ['Cars', 28360, 40]]
 
-	q_data = render_to_string(temp, {'q':type_total_and_amount})
+		[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
+		
+		print(type_total_and_amount)
+
+		all_type_total_and_amount.append(type_total_and_amount)
+	temp = 'app/data.html'
+
+	if gate_number in ('Facility 1', 'Facility 2'):
+		temp = 'app/facility.html'
+
+	q_data = render_to_string(temp, {
+		'q':all_type_total_and_amount, 'gate_number': gate_number, 'total_amount': overall_totals})
 
 	data = {
-		'values': values,
-		'labels': v_types,
 		'q': q_data,
 		'total': total_amount
 		}
-	return data
-
-
-@login_required
-def load_graph_data(request):
-	"""
-		A view that fetches data from AWS graphQL AppSync
-		Server and then loads the data in a html canvas of chart.js
-	"""
-	start = request.GET.get('start')
-	end = request.GET.get('end')
-	gate_no = request.GET.get('gate_no')
-	print(f'============== {gate_no} =====================')
-	data = get_table_graph_data(start=start, end=end, gate_no=gate_no)
-	data = {'data': data}
-	return JsonResponse(data['data'])
-
-@login_required
-def home(request):
-	"""
-		the home page view that returns all data from api
-	"""
-	gate_no = request.GET.get('gate')
-
-	gates = Gate.objects.all()
-
-	start = request.GET.get('start')
-	end = request.GET.get('end')
-
-	# if the user tries to filter
-	# then 'start' and 'end' will both be true
-	# therefore respond with a HttpResponse 
-	# for ajax to consume the results
-
-	if all((start, end)):
-		data = execute_gql(start=start, end=end, gate_no=gate_no)
-		if not data:
-			return HttpResponse('NoData')
-
-		template = 'async/ajax_table.html'
-		data = render_to_string(template, {'data': data})
-		return HttpResponse(data)
-	else:
-		data = execute_gql(gate_no=gate_no) # query today's default data
-
-	context = {'data': data, 'gates': gates}
-	template = 'app/table.html'
-	return render(request, template, context)
-
-@login_required
-def statistics(request):
-	gates = Gate.objects.all()
-	context = {'gates': gates, 'is_statistics_page': True}
-	template = 'app/stats.html'
-	return render(request, template, context)
-
-# @login_required
-# def generate_report(request):
-# 	start = request.GET.get('start')
-# 	end = request.GET.get('end')
-# 	print(start)
-# 	print(end)
-
-# 	if all((start, end)):
-# 		template = 'reports/statistics_report.html'
-# 		data = get_table_graph_data(start=start, end=end)
-# 		print(f'data =================================\n{data}')
-
-# 		context = {
-# 			'data':data,
-# 			'start': start,
-# 			'end': end
-# 		}
-
-# 		template = get_template(template)
-# 		html = template.render(context)
-
-# 		css_string = """@page {
-# 			size: a4 portrait;
-# 			margin: 1mm;
-# 			counter-increment: page;
-# 		}"""
-
-# 		pdf_file = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
-# 				stylesheets=[CSS(string=css_string)], presentational_hints=True)
-# 		response = HttpResponse(pdf_file, content_type='application/pdf')
-# 		response['Content-Disposition'] = 'filename="Report.pdf"'
-# 		return response
-# 		return HttpResponse(response.getvalue(), content_type='application/pdf')
-# 	else:
-# 		return HttpResponse('Please choose a date range')
+	return HttpResponse(q_data)

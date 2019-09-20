@@ -1,0 +1,51 @@
+         <div class="col-md-5 stable">
+            <h5>Gate {{ gate_number }} Pass</h5>
+               <table style="background-color: cyan" class="table table-striped table-dark">
+                <tbody>
+                  <th>#</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Total</th>
+                  {% for type, total, amount in q.0 %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ type }}</td>
+                    <td>{{ amount }}</td>
+                    <td>{{ total }}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td colspan="3">Overall Total</td>
+                    <td>{{ total_amount.0 }}</td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+
+           <div class="col-md-2">
+           </div>
+          <!-- Loading and Offloading -->
+
+          <div class="col-md-5 ftable">
+            <h5>Loading &#38; Offloading (Gate {{ gate_number }})</h5>
+               <table style="background-color: lightgreen"  class="table table-striped table-dark">
+                 <tbody>
+                  <th>#</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Total</th>
+                  {% for type, total, amount in q.1 %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ type }}</td>
+                    <td>{{ amount }}</td>
+                    <td>{{ total }}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td colspan="3">Overall Total</td>
+                    <td>{{ total_amount.1 }}</td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>

@@ -8,13 +8,6 @@
     <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- styles -->
     <link href="{% static 'app/css/styles.css' %}" rel="stylesheet">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
   </head>
   <body>
     <div class="header">
@@ -26,11 +19,14 @@
                    <h1><a href="{% url 'home_page' %}">Jimeta Ultra Modern Market</a></h1>
                 </div>
              </div>
-             <div class="col-md-2">
+             <div class="col-md-4">
                 <div class="row">
                   <div class="col-lg-12">
-                    <div class="input-group form">
-                         <input class="form-control" type="text" id="daterange" name="daterange" value="09/04/2019 - 11/15/2019" />
+                    <div class='input-group date' id='datetimepicker3'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-time"></span>
+                        </span>
                     </div>
                   </div>
                 </div>
@@ -52,47 +48,40 @@
                     </nav>
                 </div>
              </div>
-             <div class="col-md-2">
-                <div class="navbar navbar-inverse" role="banner">
-                    <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
-                      <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Gates <b class="caret"></b></a>
-                          <ul class="dropdown-menu animated fadeInUp">
-                            {% for gate in gates %}
-                              {% if is_statistics_page %}
-                                <li><a class="filter-by-gate" href="#" data-gate="{{ gate.gate_number }}">{{ gate.name }}</a></li>
-                              {% else %}
-                                <li><a href="?gate={{ gate.gate_number }}">{{ gate.name }}</a></li>
-                              {% endif %}
-                            {% endfor %}
-                            <li><a href="#">Manage Gates</a></li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </nav>
-                </div>
-             </div>
           </div>
           <div class="row">
-             <div class="col-md-4">
+             <div class="col-md-8">
                 <ul class="nav nav-tabs">
                   <li class="nav-item">
-                    <a href="{% url 'home_page' %}"><i class="glyphicon glyphicon-home"></i> Dashboard</a>
+                    <a class="gate" gate="1" href="#"><i class="glyphicon glyphicon-home" ></i> Gate I</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="2" href="#"><i class="glyphicon glyphicon-home"></i> Gate II</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="3" href="#"><i class="glyphicon glyphicon-home"></i> Gate III</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="4" href="#"><i class="glyphicon glyphicon-home"></i> Gate IV</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="5" href="#"><i class="glyphicon glyphicon-home"></i> Gate V</a>
                   </li>
                   <li class="nav-item">
-                    <a href="{% url 'stats_page' %}"><i class="glyphicon glyphicon-stats"></i> Statistics (Charts)</a>
+                    <a class="gate" gate="Facility 1" href="#"><i class="glyphicon glyphicon-th-list"></i> Facility I</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="gate" gate="Facility 2" href="#"><i class="glyphicon glyphicon-th-list"></i> Facility II</a>
                   </li>
                 </ul>
              </div>
           </div>
        </div>
-  </div>
+     </div>
+     <img class="loader" hidden src="{% static 'app/images/loader.gif' %}">
     {% block main %}
 
 		{% endblock main %}
-    </div>
-
     <footer>
          <div class="container">
             <div class="copy text-center">
@@ -103,48 +92,53 @@
       </footer>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <!-- jQuery UI -->
-    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'app/vendors/morris/morris.css' %}">
-    <script src="{% static 'app/vendors/jquery.knob.js' %}"></script>
-    <script src="{% static 'app/vendors/raphael-min.js' %}"></script>
-    <script src="{% static 'app/js/custom.js' %}"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="{% static 'app/datetimepicker/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script type="text/JavaScript">
+      function get_data(gate_number){
+        $.ajax({
+          url: '{% url 'get_data' %}',
+          data: {
+            'gate_number': gate_number
+          },
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script>
-      const today = new Date().toLocaleDateString();
-      const fullDate = `${today} - ${today}`
-      $("#daterange").val(fullDate);
+          beforeSend: function() {
+            $('.loader').removeAttr('hidden');
+          },
 
-      getDate();
-        $("#daterange").on('change', ()=>{
-          getDate();
+          complete: function() {
+            $('.loader').attr('hidden', true);
+          },
+
+          success: function(data) {
+            $('.data').html(data);
+          },
+
         });
+      }
 
-        function getDate() {
-          var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          var txt_date = $("#daterange").val();
-          from = txt_date.split(' - ')[0];
-          to = txt_date.split(' - ')[1];
-          var dte_from  = new Date(from).toLocaleDateString("en-US", options);
-          var dte_to  = new Date(to).toLocaleDateString("en-US", options);
-          var full_date = `${dte_from} to ${dte_to}`
-          $("#date_label").text(full_date);
+      var gate_number = 1
 
-          // set the url for download report
-          
-          var pdf = document.querySelector('#download_pdf');
-          var url = `{# {% url 'generate_report' %} #}?start=${from}&end=${to}`;
-          pdf.setAttribute('href', url);
+      if(window.localStorage.getItem('gate_number') !== null){
+        gate_number = window.localStorage.getItem('gate_number');
+      }
+
+      get_data(gate_number)
+
+      $('.gate').on('click', function() {
+        var gate_number = $(this).attr('gate');
+        if (gate_number !== 'Facility 1' && gate_number !== 'Facility 2'){
+          window.localStorage.setItem('gate_number', gate_number)
         }
-
-    </script>
+        get_data(gate_number);
+      });
+    
+    $(function () {$('#datetimepicker3').datetimepicker({format: 'LT'});});
+    </script>   
     {% block js %}
     {% endblock js %}
-
   </body>
 </html>
