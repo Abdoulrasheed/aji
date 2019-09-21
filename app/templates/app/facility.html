@@ -8,18 +8,20 @@
                 <tbody>
                   <th>#</th>
                   <th>Type</th>
+                  <th>Fee</th>
+                  <th>Quantity</th>
                   <th>Amount</th>
-                  <th>Total</th>
-                  {% for type, total, amount in q.2 %}
+                  {% for type, amount, fee in q.2 %}
                   <tr>
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ type }}</td>
+                    <td>{{ fee }}</td>
+                    <td>{% widthratio amount fee 1 %}</td>
                     <td>{{ amount }}</td>
-                    <td>{{ total }}</td>
                   </tr>
                   {% endfor %}
                   <tr>
-                    <td colspan="3">Overall Total</td>
+                    <td colspan="4">Overall Total</td>
                     <td>{{ total_amount.0 }}</td>
                   </tr>
                 </tbody>

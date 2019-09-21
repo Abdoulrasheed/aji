@@ -55,14 +55,14 @@ def execute_gql(**kwargs):
 
 	loading_offloading_output_dict = []
 	for x in input_dict['items']:
-		if x['deviceName'] is gate_no and x['receiptType'] == 'Loading/Offloading':
+		if x['deviceName'] == gate_no and x['receiptType'] == 'Loading/Offloading':
 			loading_offloading_output_dict.append(x)
 
 	# filter 'Facility' data by Facility number
 
 	facility_output_dict = []
 	for x in input_dict['items']:
-		if x['deviceName'] is facility_no:
+		if x['deviceName'] == facility_no:
 			facility_output_dict.append(x)
 
 	# Transform python object back into json
@@ -114,8 +114,6 @@ def get_data(request):
 		type_total_and_amount = [] # [['Cars', 28360, 40],  ['Cars', 28360, 40]]
 
 		[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
-		
-		print(type_total_and_amount)
 
 		all_type_total_and_amount.append(type_total_and_amount)
 	temp = 'app/data.html'
