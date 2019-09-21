@@ -154,6 +154,7 @@
 
       $('#date').on('change', function() {
         var date = $(this).val();
+        gate_number = window.localStorage.getItem('gate_number');
         get_data(gate_number, date);
         window.localStorage.setItem('date', String(date));
       });
