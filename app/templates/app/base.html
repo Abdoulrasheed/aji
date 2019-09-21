@@ -9,12 +9,17 @@
     <!-- styles -->
     <link href="{% static 'app/css/styles.css' %}" rel="stylesheet">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+      #datepicker {
+        width: 180px;
+        margin-top: 8px;
+      }
+      #datepicker > span:hover {
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <div class="header">
@@ -26,23 +31,16 @@
                    <h1><a href="{% url 'home_page' %}">Jimeta Ultra Modern Market</a></h1>
                 </div>
              </div>
+
+             <!-- Date Field -->
              <div class="col-md-5">
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="input-group form">
-                   <input class="form-control" type="text" id="daterange" name="daterange" value="09/04/2019 - 11/15/2019" />
-                 </div>
-                 </div>
-                  <div class="col-lg-6">
-                    <div class="input-group form">
-                         <input type="text" class="form-control" placeholder="Search...">
-                         <span class="input-group-btn">
-                           <button class="btn btn-primary" type="button">Search</button>
-                         </span>
-                    </div>
-                  </div>
-                </div>
+              <div id="datepicker" class="input-group date" data-date-format="yyyy-mm-dd">
+                <input class="form-control" id="date" type="text" readonly />
+                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+              </div>
              </div>
+             <!-- Date Field Ends -->
+
              <div class="col-md-2">
                 <div class="navbar navbar-inverse" role="banner">
                     <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
@@ -62,24 +60,38 @@
              </div>
           </div>
           <div class="row">
-             <div class="col-md-4">
+             <div class="col-md-8">
                 <ul class="nav nav-tabs">
                   <li class="nav-item">
-                    <a href="{% url 'home_page' %}"><i class="glyphicon glyphicon-home"></i> Dashboard</a>
+                    <a class="gate" gate="1" href="#"><i class="glyphicon glyphicon-home" ></i> Gate I</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="2" href="#"><i class="glyphicon glyphicon-home"></i> Gate II</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="3" href="#"><i class="glyphicon glyphicon-home"></i> Gate III</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="4" href="#"><i class="glyphicon glyphicon-home"></i> Gate IV</a>
+                  </li>
+                   <li class="nav-item">
+                    <a class="gate" gate="5" href="#"><i class="glyphicon glyphicon-home"></i> Gate V</a>
                   </li>
                   <li class="nav-item">
-                    <a href="{% url 'stats_page' %}"><i class="glyphicon glyphicon-stats"></i> Statistics (Charts)</a>
+                    <a class="gate" gate="Facility 1" href="#"><i class="glyphicon glyphicon-th-list"></i> Facility I</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="gate" gate="Facility 2" href="#"><i class="glyphicon glyphicon-th-list"></i> Facility II</a>
                   </li>
                 </ul>
              </div>
           </div>
        </div>
-  </div>
+     </div>
+     <img class="loader" hidden src="{% static 'app/images/loader.gif' %}">
     {% block main %}
 
 		{% endblock main %}
-    </div>
-
     <footer>
          <div class="container">
             <div class="copy text-center">
@@ -90,48 +102,75 @@
       </footer>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <!-- jQuery UI -->
-    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'app/vendors/morris/morris.css' %}">
-    <script src="{% static 'app/vendors/jquery.knob.js' %}"></script>
-    <script src="{% static 'app/vendors/raphael-min.js' %}"></script>
-    <script src="{% static 'app/js/custom.js' %}"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script>
-      const today = new Date().toLocaleDateString();
-      const fullDate = `${today} - ${today}`
-      $("#daterange").val(fullDate);
+    <script type="text/JavaScript">
+      function get_data(gate_number, date){
+        var date = String(date);
+        $.ajax({
+          url: '{% url 'get_data' %}',
+          data: {
+            'gate_number': gate_number,
+            'date': date,
+          },
 
-      getDate();
-        $("#daterange").on('change', ()=>{
-          getDate();
+          beforeSend: function() {
+            $('.loader').removeAttr('hidden');
+          },
+
+          complete: function() {
+            $('.loader').attr('hidden', true);
+          },
+
+          success: function(data) {
+            $('.data').html(data);
+          },
+
         });
+      }
 
-        function getDate() {
-          var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-          var txt_date = $("#daterange").val();
-          from = txt_date.split(' - ')[0];
-          to = txt_date.split(' - ')[1];
-          var dte_from  = new Date(from).toLocaleDateString("en-US", options);
-          var dte_to  = new Date(to).toLocaleDateString("en-US", options);
-          var full_date = `${dte_from} to ${dte_to}`
-          $("#date_label").text(full_date);
+      var gate_number = 1
 
-          // set the url for download report
-          
-          var pdf = document.querySelector('#download_pdf');
-          var url = `{% url 'generate_report' %}?start=${from}&end=${to}`;
-          pdf.setAttribute('href', url);
+      if(window.localStorage.getItem('gate_number') !== null){
+        gate_number = window.localStorage.getItem('gate_number');
+      }
+
+      get_data(gate_number, date)
+
+      $('.gate').on('click', function() {
+        var gate_number = $(this).attr('gate');
+        if (gate_number !== 'Facility 1' && gate_number !== 'Facility 2'){
+          window.localStorage.setItem('gate_number', gate_number)
         }
+        get_data(gate_number, date);
+      });
 
-    </script>
+
+      $('#date').on('change', function() {
+        var date = $(this).val();
+        get_data(gate_number, date);
+        window.localStorage.setItem('date', String(date));
+      });
+
+    $(function () {
+        $("#datepicker").datepicker({
+              autoclose: true, 
+              todayHighlight: true
+        }).datepicker('update', new Date());
+        var date = String($('#date').val());
+      });
+
+    if(window.localStorage.getItem('date') !== null){
+        date = window.localStorage.getItem('date');
+      }
+    </script>   
     {% block js %}
     {% endblock js %}
-
   </body>
 </html>

@@ -1,32 +1,4 @@
-$(document).ready(()=>{
-    const endpoint = `${window.location.origin}/api/`
-    $.ajax({
-      method: "GET",
-      url: endpoint,
-      beforeSend: ()=>{
-        $('.loader').removeAttr('hidden');
-      },
-
-      complete: ()=>{
-        $('.loader').attr('hidden', true);
-      },
-
-      success: (data) => {
-        total = data.total
-        html_detail = data.q
-        setData(total, html_detail);
-
-        labels = data.labels
-        values = data.values
-        setGraph(labels, values);
-      },
-
-      error: (error_data) => {
-        console.log(`error_data: ${error_data}`);
-      },
-    });
-});
-    const setData = (total, html_detail) =>{
+const setData = (total, html_detail) =>{
         $('.v_total').text(total);
         $('.v_detail').html(html_detail);
 
@@ -72,3 +44,34 @@ $(document).ready(()=>{
         }
     });
     }
+
+$(document).ready(()=>{
+    const endpoint = `${window.location.origin}/api/`
+    $.ajax({
+      method: "GET",
+      url: endpoint,
+      beforeSend: ()=>{
+        $('.loader').removeAttr('hidden');
+      },
+
+      complete: ()=>{
+        $('.loader').attr('hidden', true);
+      },
+
+      success: (data) => {
+        total = data.total
+        html_detail = data.q
+        setData(total, html_detail);
+
+        labels = data.labels
+        values = data.values
+        setGraph(labels, values);
+      },
+
+      error: (error_data) => {
+        console.log(error_data);
+        console.log(`error_data: ${error_data}`);
+      },
+    });
+});
+    
