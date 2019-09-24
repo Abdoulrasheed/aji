@@ -112,7 +112,7 @@
 
     <script type="text/JavaScript">
       function get_data(gate_number, date){
-        var date = String(date);
+        date = $('#date').val();
         $.ajax({
           url: '{% url 'get_data' %}',
           data: {

@@ -29,11 +29,10 @@ def execute_gql(**kwargs):
 	gate_no = kwargs.get('gate_number')
 	date = kwargs.get('date')
 
-	facility_no = kwargs.get('facility_number')
-
-	gate_no = f'Gate {gate_no}'
-
-	facility_no = f'Facility {facility_no}'
+	if gate_no in ('Facility 1', 'Facility 2'):
+		gate_no = kwargs.get('gate_number')
+	else:
+		gate_no = f'Gate {gate_no}'
 
 	query = '''
 		query { 
@@ -66,8 +65,10 @@ def execute_gql(**kwargs):
 
 	facility_output_dict = []
 	for x in input_dict['items']:
-		if x['deviceName'] == facility_no and x['date'] == date:
+		if x['deviceName'] == gate_no and x['date'] == date:
 			facility_output_dict.append(x)
+
+	print(date)
 			
 	data = [gate_output_dict, loading_offloading_output_dict, facility_output_dict]
 	return data
@@ -78,6 +79,12 @@ def get_data(request):
 	gate_number = request.GET.get('gate_number')
 
 	date = request.GET.get('date')
+
+	temp = 'app/data.html'
+
+	if gate_number in ('Facility 1', 'Facility 2'):
+		temp = 'app/facility.html'
+		gate_number = request.GET.get('gate_number')
 
 	q = execute_gql(gate_number=gate_number, date=date)
 
@@ -112,10 +119,6 @@ def get_data(request):
 		[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
 
 		all_type_total_and_amount.append(type_total_and_amount)
-	temp = 'app/data.html'
-
-	if gate_number in ('Facility 1', 'Facility 2'):
-		temp = 'app/facility.html'
 
 	q_data = render_to_string(temp, {
 		'q':all_type_total_and_amount, 'gate_number': gate_number, 'total_amount': overall_totals})
