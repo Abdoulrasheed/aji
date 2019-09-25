@@ -145,9 +145,7 @@
 
       $('.gate').on('click', function() {
         var gate_number = $(this).attr('gate');
-        if (gate_number !== 'Facility 1' && gate_number !== 'Facility 2'){
-          window.localStorage.setItem('gate_number', gate_number)
-        }
+        window.localStorage.setItem('gate_number', gate_number)
         get_data(gate_number, date);
       });
 
