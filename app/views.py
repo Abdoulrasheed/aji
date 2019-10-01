@@ -52,28 +52,20 @@ def execute_gql(**kwargs):
 	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, json={'query': query}, headers=headers)
 
 	input_dict = data.json()['data']['listJummApps']
+	print(input_dict)
 
-	# filter 'Gates Pass' data by gate number
-
+	# get data whose gate number equals 'Gates Pass'
 	gate_output_dict = []
-	for x in input_dict['items']:
-		if x['receiptType'] == 'Gate Pass':
-			gate_output_dict.append(x)
-
-	# filter 'Loading/Offloading' data by gate number
-
+	[gate_output_dict.append(x) for x in input_dict['items'] if x['receiptType'] == 'Gate Pass']
+	
+	# get data whose gate number equals 'Loading/Offloading'
 	loading_offloading_output_dict = []
-	for x in input_dict['items']:
-		if x['receiptType'] == 'Loading/Offloading':
-			loading_offloading_output_dict.append(x)
-
-	# filter 'Facility' data by Facility number
-
+	[loading_offloading_output_dict.append(x) for x in input_dict['items'] if x['receiptType'] == 'Loading/Offloading']
+	
+	# get data whose deviceName equals 'Facility'
 	facility_output_dict = []
-	for x in input_dict['items']:
-		if x['deviceName'] == gate_no:
-			facility_output_dict.append(x)
-
+	[facility_output_dict.append(x) for x in input_dict['items'] if x['deviceName'] == gate_no]
+			
 	data = [gate_output_dict, loading_offloading_output_dict, facility_output_dict]
 	return data
 
