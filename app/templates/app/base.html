@@ -115,6 +115,7 @@
         date = $('#date').val();
         $.ajax({
           url: '{% url 'get_data' %}',
+
           data: {
             'gate_number': gate_number,
             'date': date,
@@ -149,8 +150,7 @@
         get_data(gate_number, date);
       });
 
-
-      $('#date').on('change', function() {
+      $('#date').off('change').on('change', function() {
         var date = $(this).val();
         gate_number = window.localStorage.getItem('gate_number');
         get_data(gate_number, date);
