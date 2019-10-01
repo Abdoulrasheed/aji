@@ -112,7 +112,7 @@
 
     <script type="text/JavaScript">
       function get_data(gate_number, date){
-        date = $('#date').val();
+        console.log(gate_number);
         $.ajax({
           url: '{% url 'get_data' %}',
 
@@ -136,33 +136,36 @@
         });
       }
 
-      var gate_number = 1
-
-      if(window.localStorage.getItem('gate_number') !== null){
-        gate_number = window.localStorage.getItem('gate_number');
-      }
-
-      get_data(gate_number, date)
-
-      $('.gate').on('click', function() {
-        var gate_number = $(this).attr('gate');
-        window.localStorage.setItem('gate_number', gate_number)
-        get_data(gate_number, date);
-      });
-
-      $('#date').off('change').on('change', function() {
-        var date = $(this).val();
-        gate_number = window.localStorage.getItem('gate_number');
-        get_data(gate_number, date);
-        window.localStorage.setItem('date', String(date));
-      });
-
-    $(function () {
+      $(function () {
         $("#datepicker").datepicker({
               autoclose: true, 
               todayHighlight: true
         }).datepicker('update', new Date());
         var date = String($('#date').val());
+        get_data(gate_number, date);
+      });
+
+      var gate_number = 1;
+      
+
+      if(window.localStorage.getItem('gate_number') !== null){
+        gate_number = window.localStorage.getItem('gate_number');
+      }
+
+      
+
+      $('.gate').on('click', function() {
+        var gate_number = $(this).attr('gate');
+        window.localStorage.setItem('gate_number', gate_number)
+        var date = String($('#date').val());
+        get_data(gate_number, date);
+      });
+
+    $('#datepicker').on('changeDate', function() {
+          var date = String($('#date').val());
+          gate_number = window.localStorage.getItem('gate_number');
+          get_data(gate_number, date);
+          window.localStorage.setItem('date', String(date));
       });
 
     if(window.localStorage.getItem('date') !== null){
