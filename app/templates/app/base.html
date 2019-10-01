@@ -157,11 +157,12 @@
       $('.gate').on('click', function() {
         var gate_number = $(this).attr('gate');
         window.localStorage.setItem('gate_number', gate_number)
+        var date = String($('#date').val());
         get_data(gate_number, date);
       });
 
     $('#datepicker').on('changeDate', function() {
-          var date = $(this).val();
+          var date = String($('#date').val());
           gate_number = window.localStorage.getItem('gate_number');
           get_data(gate_number, date);
           window.localStorage.setItem('date', String(date));

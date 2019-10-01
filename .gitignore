@@ -93,4 +93,3 @@ local_settings.py
 
 .env
 db.sqlite3
-keys/
