@@ -29,46 +29,59 @@ def execute_gql(**kwargs):
 	gate_no = kwargs.get('gate_number')
 	date = kwargs.get('date')
 
-	facility_no = kwargs.get('facility_number')
+	if gate_no in ('Facility 1', 'Facility 2'):
+		gate_no = kwargs.get('gate_number')
+	else:
+		gate_no = f'Gate {gate_no}'
 
-	gate_no = f'Gate {gate_no}'
+	gate_no = f'"{gate_no}"'
+	date = f'"{date}"'
 
-	facility_no = f'Facility {facility_no}'
+	input_dict = {}
+	nextToken = "null"
+	lst = []
 
-	query = '''
-		query { 
-			listJummApps(limit: 10000) 
-					{ items {
-						itemType fee date deviceName receiptType 
-						} 
-					} 
-				}'''
-					
-	data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, json={'query': query}, headers=headers)
+	while(nextToken not in ('"None"',)):
+		query = '''
+			query {
+			  listJummApps(filter: {
+				date : {eq: %s}, 
+				deviceName: {eq: %s}}, 
+				limit: 10000,
+				nextToken: %s ){
+			    items {
+			      itemType fee date deviceName receiptType  
+			    }
+				nextToken
+			  }
+			}'''%(date, gate_no, nextToken)
+
+		data = requests.request("POST", APPSYNC_API_ENDPOINT_URL, json={'query': query}, headers=headers)
+
+		if data.status_code == 400:
+			pass
+		else:
+			if data.json()['data']['listJummApps'] is not None:
+				input_dict = data.json()['data']['listJummApps']
+				lst.append(input_dict['items'])
+				nextToken = f'"{input_dict["nextToken"]}"'
+
 	
-	input_dict = data.json()['data']['listJummApps']
-
-	# filter 'Gates Pass' data by gate number
+	res = []
+	for e in lst:
+		res = res + e
 
 	gate_output_dict = []
-	for x in input_dict['items']:
-		if x['deviceName'] == gate_no and x['receiptType'] == 'Gate Pass' and x['date'] == date:
-			gate_output_dict.append(x)
-
-	# filter 'Loading/Offloading' data by gate number
-
-	loading_offloading_output_dict = []
-	for x in input_dict['items']:
-		if x['deviceName'] == gate_no and x['receiptType'] == 'Loading/Offloading' and x['date'] == date:
-			loading_offloading_output_dict.append(x)
-
-	# filter 'Facility' data by Facility number
-
 	facility_output_dict = []
-	for x in input_dict['items']:
-		if x['deviceName'] == facility_no and x['date'] == date:
+	loading_offloading_output_dict = []
+	for x in res:
+		if x['receiptType'] == 'Gate Pass':
+			gate_output_dict.append(x)
+		elif x['receiptType'] == 'Loading/Offloading':
+			loading_offloading_output_dict.append(x)
+		elif x['receiptType'] == 'Facility Charges':
 			facility_output_dict.append(x)
-			
+
 	data = [gate_output_dict, loading_offloading_output_dict, facility_output_dict]
 	return data
 
@@ -79,7 +92,17 @@ def get_data(request):
 
 	date = request.GET.get('date')
 
+	print(request.GET)
+
+	temp = 'app/data.html'
+
+	if gate_number in ('Facility 1', 'Facility 2'):
+		temp = 'app/facility.html'
+		gate_number = request.GET.get('gate_number')
+
 	q = execute_gql(gate_number=gate_number, date=date)
+
+	#return HttpResponse(q)
 
 	if not q:
 		return HttpResponse('NoData')
@@ -112,10 +135,6 @@ def get_data(request):
 		[[type_total_and_amount.append([v, values_[v], amounts[i]]),] for i, v in zip(amounts, values_)]
 
 		all_type_total_and_amount.append(type_total_and_amount)
-	temp = 'app/data.html'
-
-	if gate_number in ('Facility 1', 'Facility 2'):
-		temp = 'app/facility.html'
 
 	q_data = render_to_string(temp, {
 		'q':all_type_total_and_amount, 'gate_number': gate_number, 'total_amount': overall_totals})

@@ -112,9 +112,10 @@
 
     <script type="text/JavaScript">
       function get_data(gate_number, date){
-        var date = String(date);
+        date = $('#date').val();
         $.ajax({
           url: '{% url 'get_data' %}',
+
           data: {
             'gate_number': gate_number,
             'date': date,
@@ -145,15 +146,13 @@
 
       $('.gate').on('click', function() {
         var gate_number = $(this).attr('gate');
-        if (gate_number !== 'Facility 1' && gate_number !== 'Facility 2'){
-          window.localStorage.setItem('gate_number', gate_number)
-        }
+        window.localStorage.setItem('gate_number', gate_number)
         get_data(gate_number, date);
       });
 
-
-      $('#date').on('change', function() {
+      $('#date').off('change').on('change', function() {
         var date = $(this).val();
+        gate_number = window.localStorage.getItem('gate_number');
         get_data(gate_number, date);
         window.localStorage.setItem('date', String(date));
       });
