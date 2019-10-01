@@ -9,7 +9,7 @@ import json
 from datetime import timedelta, date, datetime
 #from weasyprint import HTML, CSS
 
-from key.aws_keys import APPSYNC_API_KEY, APPSYNC_API_ENDPOINT_URL
+from keys.aws_keys import APPSYNC_API_KEY, APPSYNC_API_ENDPOINT_URL
 from functools import reduce
 from .models import Gate
 
