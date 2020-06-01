@@ -27,7 +27,7 @@ idna==2.7
 jmespath==0.9.4
 jsonschema==2.6.0
 pathspec==0.5.9
-Pillow==6.1.0
+Pillow==6.2.0
 psycopg2==2.8.3
 pycparser==2.19
 Pyphen==0.9.5
